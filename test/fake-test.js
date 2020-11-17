@@ -516,5 +516,22 @@ describe("fake", function() {
                     assert.same(actual, reason, "Same object resolved");
                 });
         });
+
+        it("should make a separate fake without tainting default behavior", function() {
+            var promise = {
+                resolve: function() {
+                    return Promise.resolve(42);
+                }
+            };
+
+            var object = {};
+            var customFake = fake.usingPromise(promise).resolves(object);
+            var defaultFake = fake.resolves(object);
+
+            return Promise.all([customFake(), defaultFake()]).then(function(values) {
+                assert.equals(values[0], 42, "Should use custom promise");
+                assert.same(values[1], object, "Same object resolved");
+            });
+        });
     });
 });
